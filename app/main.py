@@ -24,8 +24,11 @@ from app.utils.logger import logger
 async def lifespan(app: FastAPI):
     """Application lifespan: run startup migrations/init, then teardown."""
     logger.info("Initializing Data Ingestion & Analytics Platform...")
-    init_db()
-    logger.info("Database schemas and administrator accounts verified.")
+    try:
+        init_db()
+        logger.info("Database schemas and administrator accounts verified.")
+    except Exception as exc:
+        logger.error(f"Lifespan init_db warning: {exc}")
     yield
     logger.info("Application shutting down.")
 
@@ -83,7 +86,11 @@ async def serve_dashboard():
     """Serve the interactive HTML5 analytics dashboard."""
     index_path = Path(__file__).parent / "static" / "index.html"
     if index_path.exists():
-        return FileResponse(str(index_path))
+        try:
+            from fastapi.responses import HTMLResponse
+            return HTMLResponse(content=index_path.read_text(encoding="utf-8"))
+        except Exception:
+            return FileResponse(str(index_path))
     return JSONResponse({"message": f"{settings.APP_NAME} API running. Visit /docs for OpenAPI specifications."})
 
 
