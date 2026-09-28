@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ff334b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Chronicle">
+  <link rel="manifest" href="/manifest.json">
   <title>Chronicle • Data Ingestion & Analytics Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -217,6 +222,40 @@
 
       <!-- Tab: Retail Orders Feed -->
       <section id="pane-retail" class="view-pane">
+        <div class="table-card card-magma" style="margin-bottom: 1.5rem;">
+          <div class="card-header flex-between">
+            <div>
+              <h3>Marketplace Geographic Sales Report</h3>
+              <p class="muted text-xs">For any product (e.g. latest iPhone on Amazon), identify which city or area has the highest sales</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="text" id="geo-product-search" class="magma-input" placeholder="Search product (e.g. iPhone)..." value="iPhone" style="padding:0.4rem 0.8rem; font-size:0.85rem; width:220px;">
+              <button id="btn-geo-search" class="action-btn flame-btn" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Analyze Area</button>
+            </div>
+          </div>
+          <div id="geo-highlight-banner" style="padding:0.75rem 1.25rem; background: rgba(255, 51, 75, 0.1); border-bottom: 1px solid rgba(255, 51, 75, 0.2); font-size:0.85rem; color:#ff98a4;">
+            🏆 <strong>Top Area for iPhone:</strong> <span id="top-area-name">New York, NY</span> (<span id="top-area-sales">$18,724.40</span> across <span id="top-area-units">15 units</span>)
+          </div>
+          <div class="compact-table-wrap">
+            <table class="compact-table" id="table-geo-sales">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>City / Area</th>
+                  <th>State</th>
+                  <th>Country</th>
+                  <th>Product</th>
+                  <th>Units Sold</th>
+                  <th>Total Sales (USD)</th>
+                </tr>
+              </thead>
+              <tbody id="geo-sales-tbody">
+                <tr><td colspan="7" class="text-center muted">Loading geographic sales...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="table-card card-magma">
           <div class="card-header flex-between">
             <h3>Retail Order Transactions</h3>
@@ -243,22 +282,22 @@
 
       <!-- Tab: Banking Analytics -->
       <section id="pane-banking" class="view-pane">
-        <div class="bento-kpis">
+        <div class="bento-kpis" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
           <div class="kpi-box card-magma">
-            <span class="label">Total Inflow / Income</span>
-            <div class="kpi-hero text-positive" id="bank-income">$0.00</div>
-          </div>
-          <div class="kpi-box card-magma">
-            <span class="label">Total Outflow / Expenses</span>
+            <span class="label">Monthly Spending / Expenses</span>
             <div class="kpi-hero text-negative" id="bank-expense">$0.00</div>
           </div>
           <div class="kpi-box card-magma">
-            <span class="label">Cumulative Savings</span>
+            <span class="label">Monthly Net Savings</span>
             <div class="kpi-hero text-gold" id="bank-net">$0.00</div>
           </div>
           <div class="kpi-box card-magma">
             <span class="label">Total EMI & Debt Outflow</span>
             <div class="kpi-hero text-flame" id="bank-emi">$0.00</div>
+          </div>
+          <div class="kpi-box card-magma">
+            <span class="label">Available Account Balance</span>
+            <div class="kpi-hero text-positive" id="bank-balance">$0.00</div>
           </div>
         </div>
 

@@ -73,8 +73,12 @@ class RelationalLoader(BaseLoader):
 
     def _load_retail(self, df: pd.DataFrame, db: Session, summary: Dict[str, Any]) -> None:
         """Load retail data (customers, products, categories, orders, order items)."""
-        # Cache existing categories
+        # Cache existing dimensions
         categories = {c.name.lower(): c for c in db.query(Category).all()}
+        locations = {
+            f"{l.city.lower()}:{l.state.lower() if l.state else ''}:{l.country.lower()}": l
+            for l in db.query(Location).all()
+        }
         customers = {c.customer_code: c for c in db.query(Customer).all()}
         customers_by_email = {c.email.lower(): c for c in db.query(Customer).all()}
         products = {p.product_code: p for p in db.query(Product).all()}
@@ -85,7 +89,7 @@ class RelationalLoader(BaseLoader):
         customers_count = 0
         products_count = 0
 
-        # Pass 1: Upsert Categories and Customers / Products if provided
+        # Pass 1: Upsert Categories, Locations, Customers, Products
         for _, row in df.iterrows():
             row_dict = row.to_dict()
 
@@ -101,6 +105,24 @@ class RelationalLoader(BaseLoader):
                 db.add(new_cat)
                 db.flush()
                 categories[cat_key] = new_cat
+
+            # Ensure Location if city/state/country present
+            city = str(row_dict.get("city", "")).strip()
+            state = str(row_dict.get("state", "")).strip() or None
+            country = str(row_dict.get("country", "USA")).strip() or "USA"
+            loc_obj = None
+            if city:
+                loc_key = f"{city.lower()}:{state.lower() if state else ''}:{country.lower()}"
+                if loc_key not in locations:
+                    new_loc = Location(
+                        city=city.title(),
+                        state=state.title() if state else None,
+                        country=country.upper() if len(country) <= 3 else country.title(),
+                    )
+                    db.add(new_loc)
+                    db.flush()
+                    locations[loc_key] = new_loc
+                loc_obj = locations[loc_key]
 
             # Ensure Customer
             cust_email = str(row_dict.get("customer_email") or row_dict.get("email") or "").lower().strip()
@@ -123,6 +145,7 @@ class RelationalLoader(BaseLoader):
                     last_name=last_name,
                     email=cust_email,
                     phone=phone,
+                    location_id=loc_obj.id if loc_obj else None,
                     tier=tier,
                 )
                 db.add(new_cust)
@@ -130,6 +153,8 @@ class RelationalLoader(BaseLoader):
                 customers[new_cust.customer_code] = new_cust
                 customers_by_email[cust_email] = new_cust
                 customers_count += 1
+            elif cust_email and loc_obj and customers_by_email[cust_email].location_id is None:
+                customers_by_email[cust_email].location_id = loc_obj.id
 
             # Ensure Product
             prod_code = str(row_dict.get("product_code", "")).strip()

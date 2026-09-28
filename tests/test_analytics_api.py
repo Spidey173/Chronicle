@@ -72,3 +72,12 @@ def test_analytics_dashboard_summary(client):
     assert "banking" in data
     assert "monthly_sales" in data
     assert "categories" in data
+
+
+def test_product_sales_by_area(client):
+    response = client.get("/api/v1/analytics/product-sales-by-area")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "rankings" in data
+    assert isinstance(data["rankings"], list)
+

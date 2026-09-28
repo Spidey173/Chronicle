@@ -268,10 +268,14 @@ function renderCategoryChart(categories) {
 function renderBankingTab(b) {
   if (!b) return;
 
-  document.getElementById("bank-income").textContent = `$${(b.total_income_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-  document.getElementById("bank-expense").textContent = `$${(b.total_expenses_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-  document.getElementById("bank-net").textContent = `$${(b.net_savings_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-  document.getElementById("bank-emi").textContent = `$${(b.total_emi_paid_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  const elExpense = document.getElementById("bank-expense");
+  if (elExpense) elExpense.textContent = `$${(b.total_expenses_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  const elNet = document.getElementById("bank-net");
+  if (elNet) elNet.textContent = `$${(b.net_savings_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  const elEmi = document.getElementById("bank-emi");
+  if (elEmi) elEmi.textContent = `$${(b.total_emi_paid_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  const elBal = document.getElementById("bank-balance");
+  if (elBal) elBal.textContent = `$${(b.available_balance_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
   // Banking category bar/polar
   const catCanvas = document.getElementById("bankingCategoryCanvas");
@@ -400,11 +404,66 @@ function setupNavigation() {
       }
 
       // Fast tab population
-      if (tabId === "retail") fetchRetailOrders();
+      if (tabId === "retail") {
+        fetchRetailOrders();
+        fetchGeoSales("iPhone");
+      }
       if (tabId === "ingest") fetchBatches();
       if (tabId === "quarantine") fetchQuarantine();
     });
   });
+
+  // Wire up geographic sales search button and Enter key
+  const btnGeo = document.getElementById("btn-geo-search");
+  const inputGeo = document.getElementById("geo-product-search");
+  if (btnGeo && inputGeo) {
+    btnGeo.addEventListener("click", () => fetchGeoSales(inputGeo.value.trim()));
+    inputGeo.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") fetchGeoSales(inputGeo.value.trim());
+    });
+  }
+}
+
+async function fetchGeoSales(productName = "iPhone") {
+  try {
+    const query = productName ? `?product_name=${encodeURIComponent(productName)}` : "";
+    const res = await fetch(`/api/v1/analytics/product-sales-by-area${query}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const tbody = document.getElementById("geo-sales-tbody");
+    const banner = document.getElementById("geo-highlight-banner");
+    
+    if (data.top_area && data.rankings.length > 0) {
+      const top = data.rankings[0];
+      if (banner) {
+        banner.innerHTML = `🏆 <strong>Highest Sales Area for ${data.product_filter || 'Product'}:</strong> <span style="color:#ffbe3b; font-weight:700;">${top.city}, ${top.state || ''}</span> (<span style="color:#ff5e36;">$${top.total_sales.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span> across <strong>${top.units_sold} units</strong>)`;
+      }
+    } else {
+      if (banner) {
+        banner.innerHTML = `ℹ️ No geographic sales data recorded for "<strong>${productName}</strong>". Try searching "iPhone", "UltraBook", or "Galaxy".`;
+      }
+    }
+
+    if (!tbody) return;
+    if (!data.rankings || !data.rankings.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center muted">No sales records found for "${productName}".</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.rankings.map((r, i) => `
+      <tr>
+        <td><span class="badge-pill" style="${i === 0 ? 'background:rgba(255,190,59,0.25); color:#ffbe3b; font-weight:bold;' : ''}">#${i + 1}</span></td>
+        <td><strong>${r.city}</strong></td>
+        <td>${r.state || '—'}</td>
+        <td>${r.country}</td>
+        <td>${r.product_name}</td>
+        <td>${r.units_sold}</td>
+        <td><strong style="color:#ffbe3b">$${r.total_sales.toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong></td>
+      </tr>
+    `).join("");
+  } catch (err) {
+    console.error("Error fetching geo sales:", err);
+  }
 }
 
 async function fetchRetailOrders() {

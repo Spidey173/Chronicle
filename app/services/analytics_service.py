@@ -8,13 +8,15 @@ from sqlalchemy.orm import Session
 
 from app.models.banking import BankAccount, Transaction
 from app.models.common import IngestionBatch, RejectedRecord
-from app.models.retail import Category, Customer, Order, OrderItem, Product
+from app.models.retail import Category, Customer, Location, Order, OrderItem, Product
 from app.schemas.analytics import (
     BankingSummaryResponse,
     CategorySummaryItem,
     DashboardSummaryResponse,
     DataQualityMetrics,
     MonthlySalesItem,
+    ProductAreaSalesItem,
+    ProductAreaSalesResponse,
     RevenueAnalytics,
     SpendingByCategoryItem,
     TopCustomerItem,
@@ -55,6 +57,58 @@ class AnalyticsService:
             )
             for r in results
         ]
+
+    @staticmethod
+    def get_product_sales_by_area(
+        db: Session,
+        product_name: Optional[str] = None,
+        limit: int = 10,
+    ) -> ProductAreaSalesResponse:
+        """Find which geographic place/area has the highest sales for a product (e.g. iPhone on Amazon)."""
+        query = (
+            db.query(
+                Location.city.label("city"),
+                Location.state.label("state"),
+                Location.country.label("country"),
+                Product.name.label("product_name"),
+                func.coalesce(func.sum(OrderItem.quantity), 0).label("units_sold"),
+                func.coalesce(func.sum(OrderItem.item_total), 0.0).label("total_sales"),
+            )
+            .join(Customer, Customer.location_id == Location.id)
+            .join(Order, Order.customer_id == Customer.id)
+            .join(OrderItem, OrderItem.order_id == Order.id)
+            .join(Product, OrderItem.product_id == Product.id)
+        )
+
+        if product_name:
+            query = query.filter(Product.name.ilike(f"%{product_name}%"))
+
+        results = (
+            query.group_by(Location.city, Location.state, Location.country, Product.name)
+            .order_by(func.sum(OrderItem.item_total).desc())
+            .limit(limit)
+            .all()
+        )
+
+        rankings = [
+            ProductAreaSalesItem(
+                city=r.city,
+                state=r.state,
+                country=r.country,
+                product_name=r.product_name,
+                units_sold=int(r.units_sold),
+                total_sales=round(float(r.total_sales), 2),
+                currency="USD",
+            )
+            for r in results
+        ]
+
+        top_area = rankings[0].city if rankings else None
+        return ProductAreaSalesResponse(
+            product_filter=product_name,
+            top_area=top_area,
+            rankings=rankings,
+        )
 
     @staticmethod
     def get_monthly_sales(db: Session, year: Optional[int] = None) -> List[MonthlySalesItem]:
@@ -262,12 +316,22 @@ class AnalyticsService:
         )
         type_map = {t: round(float(a), 2) for t, a in type_results}
 
+        # Available balance across active accounts
+        balance_val = (
+            db.query(func.coalesce(func.sum(BankAccount.balance), 0.0))
+            .filter(BankAccount.status == "Active")
+            .scalar()
+            or 0.0
+        )
+
         return BankingSummaryResponse(
             total_income_usd=round(income_val, 2),
             total_expenses_usd=round(expense_val, 2),
+            monthly_spending_usd=round(expense_val, 2),
             net_savings_usd=net_savings,
             savings_rate_percentage=savings_rate,
             total_emi_paid_usd=round(emi_val, 2),
+            available_balance_usd=round(balance_val, 2),
             total_transactions=total_txns,
             spending_by_category=spending_items,
             transactions_by_type=type_map,

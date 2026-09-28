@@ -138,3 +138,28 @@ CALCULATE(
     SUM(transactions[amount_usd]),
     transactions[category] IN {"Dining", "Entertainment", "Shopping"}
 )
+
+// Total Available Bank Balance
+Available Bank Balance = SUM(bank_accounts[balance])
+
+// ------------------------------------------------------------------------------
+// 5. GEOGRAPHIC & MARKETPLACE PRODUCT SALES (e.g., iPhone on Amazon)
+// ------------------------------------------------------------------------------
+
+// Product Sales by Geographic City / Area
+Product Sales By Area = 
+CALCULATE(
+    SUM(order_items[item_total])
+)
+
+// Highest Sales Area for Selected Product
+Highest Sales City = 
+CALCULATE(
+    FIRSTNONBLANK(locations[city], 1),
+    TOPN(
+        1,
+        ALLSELECTED(locations[city]),
+        [Product Sales By Area],
+        DESC
+    )
+)

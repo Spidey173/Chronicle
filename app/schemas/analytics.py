@@ -58,12 +58,30 @@ class SpendingByCategoryItem(BaseModel):
     percentage: float
 
 
+class ProductAreaSalesItem(BaseModel):
+    city: str
+    state: Optional[str] = None
+    country: str
+    product_name: str
+    units_sold: int
+    total_sales: float
+    currency: str = "USD"
+
+
+class ProductAreaSalesResponse(BaseModel):
+    product_filter: Optional[str] = None
+    top_area: Optional[str] = None
+    rankings: List[ProductAreaSalesItem]
+
+
 class BankingSummaryResponse(BaseModel):
     total_income_usd: float
     total_expenses_usd: float
+    monthly_spending_usd: float
     net_savings_usd: float
     savings_rate_percentage: float
     total_emi_paid_usd: float
+    available_balance_usd: float
     total_transactions: int
     spending_by_category: List[SpendingByCategoryItem]
     transactions_by_type: Dict[str, float]

@@ -12,6 +12,7 @@ from app.schemas.analytics import (
     DashboardSummaryResponse,
     DataQualityMetrics,
     MonthlySalesItem,
+    ProductAreaSalesResponse,
     RevenueAnalytics,
     TopCustomerItem,
     TopProductItem,
@@ -25,6 +26,16 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 def get_dashboard_summary(db: Session = Depends(get_db)):
     """Retrieve complete unified dashboard metrics in a single fast call."""
     return AnalyticsService.get_dashboard_summary(db)
+
+
+@router.get("/product-sales-by-area", response_model=ProductAreaSalesResponse)
+def get_product_sales_by_area(
+    product_name: Optional[str] = Query(None, description="Product name to filter (e.g., 'iPhone', 'UltraBook')"),
+    limit: int = Query(10, ge=1, le=100, description="Max areas to return"),
+    db: Session = Depends(get_db),
+):
+    """Identify which place, city, or area has the highest sales for a specific product (e.g. iPhone on Amazon)."""
+    return AnalyticsService.get_product_sales_by_area(db, product_name=product_name, limit=limit)
 
 
 @router.get("/top-products", response_model=List[TopProductItem])
