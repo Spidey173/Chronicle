@@ -22,7 +22,7 @@
 * **High-Performance REST APIs**: Built with **FastAPI** with JWT authentication, role-based authorization (Admin/User), structured JSON logging, pagination, filtering, and auto-generated Swagger/OpenAPI documentation.
 * **Single-Command CLI & Execution**: Complete pipeline execution, database setup, and analytics printing executable with a single command via `python -m app.cli` or `Makefile`.
 * **Power BI Integration**: Complete Semantic Tabular Model schema definitions (`.bim`), comprehensive DAX measure library (`powerbi/dax_measures.dax`), and DirectQuery connection guide.
-* **Interactive Web Analytics Dashboard**: Built-in glassmorphism web dashboard with real-time Chart.js charts, KPI cards, file upload portal, and dead-letter quarantine inspector.
+* **Interactive Web Analytics Dashboard**: High-performance executive web dashboard with real-time Chart.js visual analytics, KPI cards, file upload portal, and dead-letter quarantine inspector.
 * **Cloud-Ready AWS Infrastructure**: Fully documented AWS deployment architecture with **Terraform IaC** scripts provisioning Amazon S3, RDS PostgreSQL, ECS Fargate, Lambda triggers, and CloudWatch.
 * **Robust Test Suite**: 36 automated unit, integration, and API tests with **81%+ test coverage** using Pytest.
 
