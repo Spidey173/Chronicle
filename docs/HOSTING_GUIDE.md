@@ -5,15 +5,53 @@ This guide provides step-by-step instructions to host and deploy the **Chronicle
 ---
 
 ## Table of Contents
-1. [Option 1: Render.com (Recommended - 1-Click / Free Tier)](#option-1-rendercom-recommended)
-2. [Option 2: Railway.app (Zero-Config PaaS)](#option-2-railwayapp-fastest-setup)
-3. [Option 3: Any VPS (DigitalOcean / AWS EC2 / Hetzner) with Docker Compose](#option-3-vps-with-docker-compose)
-4. [Option 4: AWS Enterprise Production (ECS Fargate + RDS via Terraform)](#option-4-aws-enterprise-production)
-5. [Environment Variables Reference](#environment-variables-reference)
+1. [Option 1: Vercel (Fastest Serverless Deployment)](#option-1-vercel-fastest-serverless-deployment)
+2. [Option 2: Render.com (1-Click Blueprint with Managed PostgreSQL)](#option-2-rendercom-1-click-blueprint)
+3. [Option 3: Railway.app (Zero-Config PaaS)](#option-3-railwayapp-fastest-setup)
+4. [Option 4: Any VPS (DigitalOcean / AWS EC2 / Hetzner) with Docker Compose](#option-4-vps-with-docker-compose)
+5. [Option 5: AWS Enterprise Production (ECS Fargate + RDS via Terraform)](#option-5-aws-enterprise-production)
+6. [Environment Variables Reference](#environment-variables-reference)
 
 ---
 
-## Option 1: Render.com (Recommended)
+## Option 1: Vercel (Fastest Serverless Deployment)
+
+The repository includes pre-configured [`vercel.json`](../vercel.json) and [`api/index.py`](../api/index.py) for instantaneous serverless deployment on Vercel.
+
+### Step-by-Step Instructions:
+
+1. **Go to Vercel**:
+   * Open [https://vercel.com/new](https://vercel.com/new) and log in with your GitHub account.
+
+2. **Import Repository**:
+   * Under "Import Git Repository", locate `Spidey173/Chronicle` and click **Import**.
+
+3. **Configure Project**:
+   * **Project Name**: `chronicle` (or your preferred name).
+   * **Framework Preset**: Leave as **Other** (Vercel will automatically read `vercel.json` and build via `@vercel/python`).
+   * **Root Directory**: `./` (leave default).
+
+4. **Add Environment Variables**:
+   Under **Environment Variables**, expand the section and add:
+   * `ENVIRONMENT`: `production`
+   * `SECRET_KEY`: *Enter a random 32+ character string* (e.g. `c78bfa83e0204781b212f849204859a8421b8c`)
+   * `DATABASE_URL` *(Recommended for persistent data)*:
+     * If you have a hosted PostgreSQL database (such as **Neon**, **Supabase**, or **Vercel Postgres**), paste your connection string here:
+       `postgresql+psycopg://username:password@ep-xyz.us-east-1.aws.neon.tech/neondb?sslmode=require`
+     * *(If omitted, Chronicle will run in ephemeral demo mode using `/tmp/analytics.db`).*
+
+5. **Deploy**:
+   * Click **Deploy**.
+   * Vercel will install the dependencies from `requirements.txt`, bundle the serverless runtime, and launch your platform in ~45 seconds.
+
+6. **Access Your Application**:
+   * Your dashboard is live at: `https://<your-project-name>.vercel.app/`
+   * Interactive Swagger docs: `https://<your-project-name>.vercel.app/docs`
+   * ReDoc API specs: `https://<your-project-name>.vercel.app/redoc`
+
+---
+
+## Option 2: Render.com (1-Click Blueprint)
 
 Render provides free hosting for web services and PostgreSQL databases. The repository includes an automated `render.yaml` Blueprint file for 1-click deployment.
 

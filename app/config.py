@@ -1,6 +1,7 @@
 """Application configuration using Pydantic Settings."""
 
 import json
+import os
 from pathlib import Path
 from typing import Dict, List
 from pydantic import Field
@@ -24,8 +25,10 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
-    # Database
-    DATABASE_URL: str = "sqlite:///./data/analytics.db"
+    # Database (uses /tmp on serverless environments like Vercel if no external DB provided)
+    DATABASE_URL: str = Field(
+        default_factory=lambda: "sqlite:////tmp/analytics.db" if os.environ.get("VERCEL") else "sqlite:///./data/analytics.db"
+    )
     DB_ECHO: bool = False
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
@@ -41,8 +44,12 @@ class Settings(BaseSettings):
     INITIAL_ADMIN_NAME: str = "System Administrator"
 
     # Ingestion & Storage Directories
-    UPLOAD_DIR: Path = Path("./storage/uploads")
-    QUARANTINE_DIR: Path = Path("./storage/quarantine")
+    UPLOAD_DIR: Path = Field(
+        default_factory=lambda: Path("/tmp/storage/uploads") if os.environ.get("VERCEL") else Path("./storage/uploads")
+    )
+    QUARANTINE_DIR: Path = Field(
+        default_factory=lambda: Path("/tmp/storage/quarantine") if os.environ.get("VERCEL") else Path("./storage/quarantine")
+    )
     MAX_UPLOAD_SIZE_MB: int = 50
 
     # Currency exchange rates relative to USD (1.0)
@@ -65,9 +72,13 @@ class Settings(BaseSettings):
 
     def ensure_directories(self) -> None:
         """Ensure all required runtime directories exist."""
-        self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-        self.QUARANTINE_DIR.mkdir(parents=True, exist_ok=True)
-        Path("./data").mkdir(parents=True, exist_ok=True)
+        try:
+            self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+            self.QUARANTINE_DIR.mkdir(parents=True, exist_ok=True)
+            if not os.environ.get("VERCEL"):
+                Path("./data").mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
 
 
 settings = Settings()
