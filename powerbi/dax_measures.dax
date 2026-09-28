@@ -1,0 +1,140 @@
+// ==============================================================================
+// Power BI Enterprise DAX Measures Reference
+// Data Ingestion & Analytics Platform
+// ==============================================================================
+
+// ------------------------------------------------------------------------------
+// 1. RETAIL & E-COMMERCE CORE MEASURES
+// ------------------------------------------------------------------------------
+
+// Total Revenue
+Total Revenue = SUM(order_items[item_total])
+
+// Total Cost of Goods Sold (COGS)
+Total COGS = SUMX(order_items, order_items[quantity] * RELATED(products[cost_price]))
+
+// Gross Margin / Profit
+Gross Profit = [Total Revenue] - [Total COGS]
+
+// Gross Margin Percentage
+Gross Margin % = DIVIDE([Gross Profit], [Total Revenue], 0) * 100
+
+// Total Order Count
+Total Orders = DISTINCTCOUNT(orders[id])
+
+// Total Units Sold
+Total Units Sold = SUM(order_items[quantity])
+
+// Average Order Value (AOV)
+Average Order Value = DIVIDE([Total Revenue], [Total Orders], 0)
+
+// Average Items Per Order
+Items Per Order = DIVIDE([Total Units Sold], [Total Orders], 0)
+
+// ------------------------------------------------------------------------------
+// 2. TIME INTELLIGENCE & REVENUE TRENDS
+// ------------------------------------------------------------------------------
+
+// Previous Month Revenue
+Revenue Prior Month = 
+CALCULATE(
+    [Total Revenue],
+    DATEADD(orders[order_date], -1, MONTH)
+)
+
+// Month-over-Month Revenue Growth ($)
+MoM Revenue Growth $ = [Total Revenue] - [Revenue Prior Month]
+
+// Month-over-Month Revenue Growth (%)
+MoM Revenue Growth % = 
+DIVIDE(
+    [MoM Revenue Growth $],
+    [Revenue Prior Month],
+    0
+) * 100
+
+// Year-to-Date (YTD) Revenue
+YTD Revenue = 
+TOTALYTD(
+    [Total Revenue],
+    orders[order_date]
+)
+
+// Same Period Last Year (SPLY) Revenue
+Revenue SPLY = 
+CALCULATE(
+    [Total Revenue],
+    SAMEPERIODLASTYEAR(orders[order_date])
+)
+
+// ------------------------------------------------------------------------------
+// 3. CUSTOMER ANALYTICS & GROWTH
+// ------------------------------------------------------------------------------
+
+// Total Active Customers
+Active Customers = DISTINCTCOUNT(orders[customer_id])
+
+// Customer Lifetime Spend (LTV)
+Customer Lifetime Spend = 
+CALCULATE(
+    [Total Revenue],
+    ALLEXCEPT(customers, customers[id])
+)
+
+// VIP Platinum Customer Revenue
+Platinum Revenue = 
+CALCULATE(
+    [Total Revenue],
+    customers[tier] = "Platinum"
+)
+
+// ------------------------------------------------------------------------------
+// 4. BANKING & TRANSACTION ANALYTICS MEASURES
+// ------------------------------------------------------------------------------
+
+// Total Inflow / Income (Credit Transactions)
+Total Income = 
+CALCULATE(
+    SUM(transactions[amount_usd]),
+    transactions[is_expense] = FALSE()
+)
+
+// Total Outflow / Expenses (Debit Transactions)
+Total Expenses = 
+CALCULATE(
+    SUM(transactions[amount_usd]),
+    transactions[is_expense] = TRUE()
+)
+
+// Net Cash Flow / Savings ($)
+Net Savings = [Total Income] - [Total Expenses]
+
+// Savings Rate Percentage
+Savings Rate % = 
+DIVIDE(
+    [Net Savings],
+    [Total Income],
+    0
+) * 100
+
+// Total EMI & Loan Payments
+Total EMI Outflow = 
+CALCULATE(
+    SUM(transactions[amount_usd]),
+    transactions[is_emi] = TRUE()
+)
+
+// EMI-to-Income Ratio (Debt Service Ratio)
+Debt Service Ratio % = 
+DIVIDE(
+    [Total EMI Outflow],
+    [Total Income],
+    0
+) * 100
+
+// Discretionary Spending (Dining, Entertainment, Shopping)
+Discretionary Spending = 
+CALCULATE(
+    SUM(transactions[amount_usd]),
+    transactions[category] IN {"Dining", "Entertainment", "Shopping"}
+)

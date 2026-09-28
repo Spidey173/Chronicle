@@ -1,0 +1,10 @@
+transaction_ref,account_number,merchant_name,transaction_date,amount,currency,transaction_type,category,description
+TXN-2026-001,ACC-CHK-9021,Tech Corp Payroll,2026-01-01 09:00:00,8500.0,USD,Credit,Salary,Bi-weekly direct deposit
+TXN-2026-002,ACC-CHK-9021,Whole Foods Market,2026-01-03 15:30:00,184.2,USD,Debit,Groceries,Weekly organic groceries
+TXN-2026-003,ACC-CHK-9021,First Horizon Mortgage,2026-01-05 08:00:00,2100.0,USD,Debit,EMI & Loans,Home Loan EMI payment
+TXN-2026-004,ACC-CHK-9021,ConEdison Power,2026-01-12 11:45:00,145.8,USD,Debit,Utilities,Electricity and heating
+TXN-2026-005,ACC-CHK-9021,Le Bernardin,2026-01-18 20:15:00,320.0,USD,Debit,Dining,Dinner with clients
+TXN-2026-006,ACC-CHK-9021,Tech Corp Payroll,2026-01-15 09:00:00,8500.0,USD,Credit,Salary,Bi-weekly direct deposit
+TXN-2026-007,ACC-SAV-4412,Apex Auto Finance,2026-01-20 10:00:00,550.0,USD,Debit,EMI & Loans,Car Loan Monthly EMI
+TXN-2026-008,ACC-SAV-4412,Vanguard Index Fund,2026-01-25 14:00:00,1500.0,USD,Debit,Investments,Automatic index investment
+TXN-2026-009,ACC-CHK-7719,London Fintech Ltd,2026-01-28 09:30:00,6200.0,GBP,Credit,Salary,Monthly executive retainer

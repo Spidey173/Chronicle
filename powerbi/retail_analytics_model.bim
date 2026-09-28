@@ -1,0 +1,106 @@
+{
+  "name": "RetailAnalyticsSemanticModel",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "tables": [
+      {
+        "name": "Customers",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "customer_code", "dataType": "string", "sourceColumn": "customer_code" },
+          { "name": "first_name", "dataType": "string", "sourceColumn": "first_name" },
+          { "name": "last_name", "dataType": "string", "sourceColumn": "last_name" },
+          { "name": "email", "dataType": "string", "sourceColumn": "email" },
+          { "name": "phone", "dataType": "string", "sourceColumn": "phone" },
+          { "name": "tier", "dataType": "string", "sourceColumn": "tier" }
+        ]
+      },
+      {
+        "name": "Categories",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "name", "dataType": "string", "sourceColumn": "name" },
+          { "name": "slug", "dataType": "string", "sourceColumn": "slug" }
+        ]
+      },
+      {
+        "name": "Products",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "product_code", "dataType": "string", "sourceColumn": "product_code" },
+          { "name": "name", "dataType": "string", "sourceColumn": "name" },
+          { "name": "category_id", "dataType": "int64", "sourceColumn": "category_id" },
+          { "name": "unit_price", "dataType": "double", "sourceColumn": "unit_price" },
+          { "name": "cost_price", "dataType": "double", "sourceColumn": "cost_price" }
+        ]
+      },
+      {
+        "name": "Orders",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "order_number", "dataType": "string", "sourceColumn": "order_number" },
+          { "name": "customer_id", "dataType": "int64", "sourceColumn": "customer_id" },
+          { "name": "order_date", "dataType": "dateTime", "sourceColumn": "order_date" },
+          { "name": "status", "dataType": "string", "sourceColumn": "status" },
+          { "name": "total_amount", "dataType": "double", "sourceColumn": "total_amount" }
+        ]
+      },
+      {
+        "name": "OrderItems",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "order_id", "dataType": "int64", "sourceColumn": "order_id" },
+          { "name": "product_id", "dataType": "int64", "sourceColumn": "product_id" },
+          { "name": "quantity", "dataType": "int64", "sourceColumn": "quantity" },
+          { "name": "unit_price", "dataType": "double", "sourceColumn": "unit_price" },
+          { "name": "discount", "dataType": "double", "sourceColumn": "discount" },
+          { "name": "tax", "dataType": "double", "sourceColumn": "tax" },
+          { "name": "item_total", "dataType": "double", "sourceColumn": "item_total" }
+        ],
+        "measures": [
+          {
+            "name": "Total Revenue",
+            "expression": "SUM(OrderItems[item_total])",
+            "formatString": "$#,##0.00"
+          },
+          {
+            "name": "Total Units Sold",
+            "expression": "SUM(OrderItems[quantity])",
+            "formatString": "#,##0"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "Orders_Customers",
+        "fromTable": "Orders",
+        "fromColumn": "customer_id",
+        "toTable": "Customers",
+        "toColumn": "id"
+      },
+      {
+        "name": "OrderItems_Orders",
+        "fromTable": "OrderItems",
+        "fromColumn": "order_id",
+        "toTable": "Orders",
+        "toColumn": "id"
+      },
+      {
+        "name": "OrderItems_Products",
+        "fromTable": "OrderItems",
+        "fromColumn": "product_id",
+        "toTable": "Products",
+        "toColumn": "id"
+      },
+      {
+        "name": "Products_Categories",
+        "fromTable": "Products",
+        "fromColumn": "category_id",
+        "toTable": "Categories",
+        "toColumn": "id"
+      }
+    ]
+  }
+}

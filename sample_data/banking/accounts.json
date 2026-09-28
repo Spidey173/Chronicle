@@ -1,0 +1,30 @@
+[
+  {
+    "account_number": "ACC-CHK-9021",
+    "account_type": "Checking",
+    "customer_name": "Eleanor Vance",
+    "currency": "USD",
+    "balance": 18450.0
+  },
+  {
+    "account_number": "ACC-SAV-4412",
+    "account_type": "Savings",
+    "customer_name": "Marcus Chen",
+    "currency": "USD",
+    "balance": 42300.5
+  },
+  {
+    "account_number": "ACC-LN-8831",
+    "account_type": "Loan",
+    "customer_name": "David Miller",
+    "currency": "USD",
+    "balance": 250000.0
+  },
+  {
+    "account_number": "ACC-CHK-7719",
+    "account_type": "Checking",
+    "customer_name": "Aisha Patel",
+    "currency": "GBP",
+    "balance": 31200.0
+  }
+]

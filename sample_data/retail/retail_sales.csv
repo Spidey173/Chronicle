@@ -1,0 +1,7 @@
+order_number,customer_email,product_code,product_name,category,order_date,quantity,unit_price,discount,tax,currency
+ORD-2026-101,eleanor.vance@example.com,PRD-TECH-03,Smart Fitness Watch S3,Electronics,2026-04-10,1,199.0,10.0,9.45,USD
+ORD-2026-102,lucas.silva@example.com,PRD-HOME-02,Robot Vacuum & Mop,Home & Kitchen,2026-04-14,1,380.0,25.0,17.75,USD
+ORD-2026-103,elena.r@example.com,PRD-CLOTH-01,Merino Wool Thermal Sweater,Clothing,2026-05-01,2,89.0,0.0,8.9,EUR
+ORD-2026-104,j.wilson@example.com,PRD-TECH-02,Noise Cancelling Headphones,Electronics,2026-05-20,1,249.5,15.0,11.72,CAD
+ORD-2026-105,aisha.patel@example.com,PRD-TECH-01,UltraBook Pro 15,Electronics,2026-06-08,1,1299.99,50.0,62.5,USD
+ORD-2026-106,marcus.chen@example.com,PRD-BOOK-01,Designing Data-Intensive Systems,Books & Stationery,2026-06-18,1,49.99,0.0,2.5,USD

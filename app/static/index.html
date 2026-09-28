@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chronicle • Magma Analytics Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Ambient Magma Embers Glow -->
+  <div class="magma-glow-top"></div>
+  <div class="magma-glow-bottom"></div>
+
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">
+          <span class="flame-icon">🔥</span>
+        </div>
+        <div class="brand-info">
+          <h2>Chronicle</h2>
+          <span class="sub-label">Magma ETL Core</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="overview">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span>Overview</span>
+        </button>
+        <button class="nav-btn" data-tab="retail">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Retail Orders</span>
+        </button>
+        <button class="nav-btn" data-tab="banking">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span>Banking & Cashflow</span>
+        </button>
+        <button class="nav-btn" data-tab="ingest">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Ingest Data</span>
+        </button>
+        <button class="nav-btn" data-tab="quarantine">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          <span>Quarantine DLQ</span>
+          <span class="badge-pill" id="sidebar-rej-badge">0</span>
+        </button>
+        <button class="nav-btn" data-tab="powerbi">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Power BI Specs</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="links-row">
+          <a href="/docs" target="_blank" class="mini-link">Swagger</a>
+          <a href="/redoc" target="_blank" class="mini-link">ReDoc</a>
+        </div>
+        <div class="status-indicator">
+          <span class="pulse-ember"></span>
+          <span>PostgreSQL Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport -->
+    <main class="content-viewport">
+      <!-- Top Bar -->
+      <header class="masthead">
+        <div>
+          <h1 id="view-title">Executive Operations</h1>
+          <p id="view-subtitle" class="subtitle">Real-time revenue telemetry and pipeline performance</p>
+        </div>
+        <div class="masthead-controls">
+          <button id="btn-seed-data" class="action-btn outline-btn" title="Load sample records into pipeline">
+            <span>⚡ Seed Data</span>
+          </button>
+          <button id="btn-sync" class="action-btn flame-btn">
+            <span>↻ Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Alert Toast -->
+      <div id="toast" class="toast hidden"></div>
+
+      <!-- Tab: Executive Overview -->
+      <section id="pane-overview" class="view-pane active">
+        <!-- 4 Bento KPI Cards -->
+        <div class="bento-kpis">
+          <div class="kpi-box card-magma">
+            <div class="kpi-top">
+              <span class="label">Total Revenue</span>
+              <span class="delta-pill positive">+18.4%</span>
+            </div>
+            <div class="kpi-hero" id="kpi-revenue">$0.00</div>
+            <div class="kpi-footer">
+              <span class="muted" id="kpi-margin">Gross Profit: $0.00</span>
+            </div>
+          </div>
+
+          <div class="kpi-box card-magma">
+            <div class="kpi-top">
+              <span class="label">Orders Fulfilled</span>
+              <span class="icon-tag">🛒</span>
+            </div>
+            <div class="kpi-hero" id="kpi-orders">0</div>
+            <div class="kpi-footer">
+              <span class="muted" id="kpi-aov">Avg Order: $0.00</span>
+            </div>
+          </div>
+
+          <div class="kpi-box card-magma">
+            <div class="kpi-top">
+              <span class="label">Data Quality Score</span>
+              <span class="delta-pill" id="kpi-dq-pill">100%</span>
+            </div>
+            <div class="kpi-hero" id="kpi-quality">100%</div>
+            <div class="kpi-footer">
+              <span class="muted" id="kpi-quarantine">0 quarantined</span>
+            </div>
+          </div>
+
+          <div class="kpi-box card-magma">
+            <div class="kpi-top">
+              <span class="label">Net Savings / Cashflow</span>
+              <span class="icon-tag">🏦</span>
+            </div>
+            <div class="kpi-hero" id="kpi-savings">$0.00</div>
+            <div class="kpi-footer">
+              <span class="muted" id="kpi-savings-rate">Savings Rate: 0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Bento (Compact, Crisp, Not Overwhelming) -->
+        <div class="bento-charts">
+          <div class="chart-card card-magma">
+            <div class="chart-title-bar">
+              <div>
+                <h3>Revenue Trajectory</h3>
+                <span class="muted text-xs">Monthly velocity & order frequency</span>
+              </div>
+              <div class="mini-legend">
+                <span class="legend-dot ember"></span> Revenue
+                <span class="legend-dot gold" style="margin-left:8px;"></span> Orders
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="salesCanvas"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card card-magma">
+            <div class="chart-title-bar">
+              <div>
+                <h3>Category Share</h3>
+                <span class="muted text-xs">Revenue distribution</span>
+              </div>
+            </div>
+            <div class="chart-wrapper doughnut-wrap">
+              <canvas id="categoryCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tables Row -->
+        <div class="bento-tables">
+          <div class="table-card card-magma">
+            <div class="card-header">
+              <h3>Top Selling Products</h3>
+            </div>
+            <div class="compact-table-wrap">
+              <table class="compact-table" id="table-products">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Units</th>
+                    <th>Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="4" class="text-center muted">Loading products...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="table-card card-magma">
+            <div class="card-header">
+              <h3>VIP Client Segment</h3>
+            </div>
+            <div class="compact-table-wrap">
+              <table class="compact-table" id="table-customers">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Tier</th>
+                    <th>Orders</th>
+                    <th>Total Spend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="4" class="text-center muted">Loading customers...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Retail Orders Feed -->
+      <section id="pane-retail" class="view-pane">
+        <div class="table-card card-magma">
+          <div class="card-header flex-between">
+            <h3>Retail Order Transactions</h3>
+            <span class="badge-pill">PostgreSQL 3NF Data</span>
+          </div>
+          <div class="compact-table-wrap">
+            <table class="compact-table" id="table-orders-view">
+              <thead>
+                <tr>
+                  <th>Order Ref</th>
+                  <th>Customer Email</th>
+                  <th>Order Date</th>
+                  <th>Status</th>
+                  <th>Amount (USD)</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <tr><td colspan="5" class="text-center muted">Loading orders feed...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Banking Analytics -->
+      <section id="pane-banking" class="view-pane">
+        <div class="bento-kpis">
+          <div class="kpi-box card-magma">
+            <span class="label">Total Inflow / Income</span>
+            <div class="kpi-hero text-positive" id="bank-income">$0.00</div>
+          </div>
+          <div class="kpi-box card-magma">
+            <span class="label">Total Outflow / Expenses</span>
+            <div class="kpi-hero text-negative" id="bank-expense">$0.00</div>
+          </div>
+          <div class="kpi-box card-magma">
+            <span class="label">Cumulative Savings</span>
+            <div class="kpi-hero text-gold" id="bank-net">$0.00</div>
+          </div>
+          <div class="kpi-box card-magma">
+            <span class="label">Total EMI & Debt Outflow</span>
+            <div class="kpi-hero text-flame" id="bank-emi">$0.00</div>
+          </div>
+        </div>
+
+        <div class="bento-charts">
+          <div class="chart-card card-magma">
+            <div class="chart-title-bar">
+              <h3>Spending by Category</h3>
+              <span class="muted text-xs">Debit breakdown</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="bankingCategoryCanvas"></canvas>
+            </div>
+          </div>
+          <div class="chart-card card-magma">
+            <div class="chart-title-bar">
+              <h3>Income vs. Expenses</h3>
+              <span class="muted text-xs">Cashflow ratio</span>
+            </div>
+            <div class="chart-wrapper doughnut-wrap">
+              <canvas id="incomeExpenseCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Ingestion Portal -->
+      <section id="pane-ingest" class="view-pane">
+        <div class="ingestion-grid">
+          <div class="card-magma upload-box">
+            <div class="card-header">
+              <h3>Data Ingestion Hub</h3>
+              <p class="muted text-xs">Extract → Validate → Transform → Load</p>
+            </div>
+            <div class="form-row">
+              <label for="domain-select" class="text-xs muted">Business Domain:</label>
+              <select id="domain-select" class="magma-input">
+                <option value="retail">Retail & E-commerce</option>
+                <option value="banking">Banking & Transactions</option>
+              </select>
+            </div>
+            <div class="drop-area" id="drop-area">
+              <div class="drop-flame">🌋</div>
+              <div class="drop-text">
+                <span class="highlight">Choose a file</span> or drag & drop here
+              </div>
+              <span class="text-xs muted">CSV, Excel (.xlsx, .xls), or JSON up to 50MB</span>
+              <input type="file" id="file-picker" accept=".csv,.xlsx,.xls,.json" style="display:none">
+            </div>
+            <button id="btn-run-ingest" class="action-btn flame-btn w-full">
+              ⚡ Execute Pipeline
+            </button>
+          </div>
+
+          <div class="card-magma batches-box">
+            <div class="card-header">
+              <h3>Recent Ingestion Batches</h3>
+            </div>
+            <div class="compact-table-wrap">
+              <table class="compact-table" id="table-batches">
+                <thead>
+                  <tr>
+                    <th>Batch</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Valid / Rej</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody id="batches-tbody">
+                  <tr><td colspan="5" class="text-center muted">No batches processed yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Quarantine Dead-Letter Queue -->
+      <section id="pane-quarantine" class="view-pane">
+        <div class="card-magma">
+          <div class="card-header flex-between">
+            <div>
+              <h3>Dead-Letter Quarantine</h3>
+              <p class="muted text-xs">Records failing validation constraints (missing values, bad email/dates, numeric bounds)</p>
+            </div>
+          </div>
+          <div class="compact-table-wrap">
+            <table class="compact-table" id="table-quarantine">
+              <thead>
+                <tr>
+                  <th>Batch ID</th>
+                  <th>Row</th>
+                  <th>Domain</th>
+                  <th>Failure Reasons</th>
+                  <th>Quarantined Payload</th>
+                </tr>
+              </thead>
+              <tbody id="quarantine-tbody">
+                <tr><td colspan="5" class="text-center muted">Quarantine queue is empty.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Power BI Specification -->
+      <section id="pane-powerbi" class="view-pane">
+        <div class="card-magma">
+          <div class="card-header">
+            <h3>Power BI Architecture & DAX Measures</h3>
+            <p class="muted text-xs">Pre-engineered for DirectQuery and REST API Web Connectors</p>
+          </div>
+          <div class="pbi-blocks">
+            <div class="code-card">
+              <span class="code-title">PostgreSQL DirectQuery Connection</span>
+              <pre><code>Server: localhost:5432
+Database: analytics_db
+Authentication: Database (postgres / postgres)
+Tables: orders, order_items, customers, products, transactions, bank_accounts</code></pre>
+            </div>
+            <div class="code-card">
+              <span class="code-title">Core DAX Measures (powerbi/dax_measures.dax)</span>
+              <pre><code>Total Revenue = SUM(order_items[item_total])
+Gross Profit = [Total Revenue] - SUMX(order_items, order_items[quantity] * RELATED(products[cost_price]))
+MoM Growth % = DIVIDE([Total Revenue] - CALCULATE([Total Revenue], DATEADD(orders[order_date], -1, MONTH)), CALCULATE([Total Revenue], DATEADD(orders[order_date], -1, MONTH)), 0) * 100
+Net Savings = CALCULATE(SUM(transactions[amount_usd]), transactions[is_expense] = FALSE()) - CALCULATE(SUM(transactions[amount_usd]), transactions[is_expense] = TRUE())</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

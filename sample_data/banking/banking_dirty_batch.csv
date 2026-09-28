@@ -1,0 +1,8 @@
+transaction_ref,account_number,transaction_date,amount,transaction_type,category
+TXN-ERR-001,ACC-CHK-9021,2026-02-01,100.0,Debit,Dining
+,ACC-CHK-9021,2026-02-02,50.0,Debit,Groceries
+TXN-ERR-002,,2026-02-03,75.0,Debit,Utilities
+TXN-ERR-001,ACC-CHK-9021,2026-02-01,100.0,Debit,Dining
+TXN-ERR-003,ACC-CHK-9021,corrupted-date,80.0,Debit,Shopping
+TXN-ERR-004,ACC-CHK-9021,2026-02-04,-150.0,Debit,Dining
+TXN-ERR-005,ACC-CHK-9021,2026-02-05,200.0,IllegalType,Dining

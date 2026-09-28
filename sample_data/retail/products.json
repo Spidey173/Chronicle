@@ -1,0 +1,74 @@
+[
+  {
+    "product_code": "PRD-TECH-01",
+    "name": "UltraBook Pro 15",
+    "category": "Electronics",
+    "unit_price": 1299.99,
+    "cost_price": 850.0,
+    "currency": "USD",
+    "stock_quantity": 45
+  },
+  {
+    "product_code": "PRD-TECH-02",
+    "name": "Noise Cancelling Headphones",
+    "category": "Electronics",
+    "unit_price": 249.5,
+    "cost_price": 120.0,
+    "currency": "USD",
+    "stock_quantity": 120
+  },
+  {
+    "product_code": "PRD-TECH-03",
+    "name": "Smart Fitness Watch S3",
+    "category": "Electronics",
+    "unit_price": 199.0,
+    "cost_price": 95.0,
+    "currency": "USD",
+    "stock_quantity": 80
+  },
+  {
+    "product_code": "PRD-HOME-01",
+    "name": "Espresso Barista Master",
+    "category": "Home & Kitchen",
+    "unit_price": 450.0,
+    "cost_price": 220.0,
+    "currency": "USD",
+    "stock_quantity": 30
+  },
+  {
+    "product_code": "PRD-HOME-02",
+    "name": "Robot Vacuum & Mop",
+    "category": "Home & Kitchen",
+    "unit_price": 380.0,
+    "cost_price": 200.0,
+    "currency": "USD",
+    "stock_quantity": 60
+  },
+  {
+    "product_code": "PRD-CLOTH-01",
+    "name": "Merino Wool Thermal Sweater",
+    "category": "Clothing",
+    "unit_price": 89.0,
+    "cost_price": 35.0,
+    "currency": "USD",
+    "stock_quantity": 150
+  },
+  {
+    "product_code": "PRD-CLOTH-02",
+    "name": "Waterproof Trail Jacket",
+    "category": "Clothing",
+    "unit_price": 145.0,
+    "cost_price": 60.0,
+    "currency": "USD",
+    "stock_quantity": 90
+  },
+  {
+    "product_code": "PRD-BOOK-01",
+    "name": "Designing Data-Intensive Systems",
+    "category": "Books & Stationery",
+    "unit_price": 49.99,
+    "cost_price": 25.0,
+    "currency": "USD",
+    "stock_quantity": 200
+  }
+]

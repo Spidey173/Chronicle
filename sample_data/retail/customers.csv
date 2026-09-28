@@ -1,0 +1,9 @@
+customer_code,first_name,last_name,email,phone,tier
+CUST-0001,Eleanor,Vance,eleanor.vance@example.com,+1-555-0192,Platinum
+CUST-0002,Marcus,Chen,marcus.chen@example.com,+1-555-0144,Gold
+CUST-0003,Sarah,Connor,s.connor@example.com,+1-555-0187,Silver
+CUST-0004,David,Miller,david.m@example.com,+1-555-0131,Bronze
+CUST-0005,Aisha,Patel,aisha.patel@example.com,+44-20-7946-0128,Platinum
+CUST-0006,Lucas,Silva,lucas.silva@example.com,+1-555-0199,Gold
+CUST-0007,Elena,Rostova,elena.r@example.com,+49-30-123456,Silver
+CUST-0008,James,Wilson,j.wilson@example.com,+1-555-0123,Bronze

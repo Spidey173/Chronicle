@@ -1,0 +1,106 @@
+services:
+  # ----------------------------------------------------------------------------
+  # PostgreSQL Database Service
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: chronicle-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-analytics_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-analytics_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - chronicle-net
+
+  # ----------------------------------------------------------------------------
+  # FastAPI REST API Backend Service
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chronicle-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/analytics_db
+      - SECRET_KEY=super-secret-production-jwt-key-minimum-32-chars-long!
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
+      - INITIAL_ADMIN_EMAIL=admin@example.com
+      - INITIAL_ADMIN_PASSWORD=AdminSecurePassword123!
+      - UPLOAD_DIR=/app/storage/uploads
+      - QUARANTINE_DIR=/app/storage/quarantine
+    ports:
+      - "8000:8000"
+    volumes:
+      - upload_data:/app/storage/uploads
+      - quarantine_data:/app/storage/quarantine
+    networks:
+      - chronicle-net
+
+  # ----------------------------------------------------------------------------
+  # ETL Service / Pipeline Runner
+  # ----------------------------------------------------------------------------
+  etl-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chronicle-etl
+    restart: on-failure
+    depends_on:
+      api:
+        condition: service_started
+      db:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/analytics_db
+    command: >
+      sh -c "sleep 5 && python -m app.cli run-all-samples && echo 'ETL Ingestion Complete' && tail -f /dev/null"
+    volumes:
+      - upload_data:/app/storage/uploads
+      - quarantine_data:/app/storage/quarantine
+    networks:
+      - chronicle-net
+
+  # ----------------------------------------------------------------------------
+  # Redis Caching & Rate-Limiting Service
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: chronicle-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chronicle-net
+
+volumes:
+  postgres_data:
+    driver: local
+  upload_data:
+    driver: local
+  quarantine_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  chronicle-net:
+    driver: bridge

@@ -1,0 +1,80 @@
+{
+  "name": "BankingAnalyticsSemanticModel",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "tables": [
+      {
+        "name": "BankAccounts",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "account_number", "dataType": "string", "sourceColumn": "account_number" },
+          { "name": "account_type", "dataType": "string", "sourceColumn": "account_type" },
+          { "name": "customer_name", "dataType": "string", "sourceColumn": "customer_name" },
+          { "name": "currency", "dataType": "string", "sourceColumn": "currency" },
+          { "name": "balance", "dataType": "double", "sourceColumn": "balance" },
+          { "name": "status", "dataType": "string", "sourceColumn": "status" }
+        ]
+      },
+      {
+        "name": "Merchants",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "merchant_name", "dataType": "string", "sourceColumn": "merchant_name" },
+          { "name": "category", "dataType": "string", "sourceColumn": "category" }
+        ]
+      },
+      {
+        "name": "Transactions",
+        "columns": [
+          { "name": "id", "dataType": "int64", "sourceColumn": "id" },
+          { "name": "transaction_ref", "dataType": "string", "sourceColumn": "transaction_ref" },
+          { "name": "account_id", "dataType": "int64", "sourceColumn": "account_id" },
+          { "name": "merchant_id", "dataType": "int64", "sourceColumn": "merchant_id" },
+          { "name": "transaction_date", "dataType": "dateTime", "sourceColumn": "transaction_date" },
+          { "name": "amount", "dataType": "double", "sourceColumn": "amount" },
+          { "name": "currency", "dataType": "string", "sourceColumn": "currency" },
+          { "name": "amount_usd", "dataType": "double", "sourceColumn": "amount_usd" },
+          { "name": "transaction_type", "dataType": "string", "sourceColumn": "transaction_type" },
+          { "name": "category", "dataType": "string", "sourceColumn": "category" },
+          { "name": "is_expense", "dataType": "boolean", "sourceColumn": "is_expense" },
+          { "name": "is_emi", "dataType": "boolean", "sourceColumn": "is_emi" },
+          { "name": "balance_after", "dataType": "double", "sourceColumn": "balance_after" }
+        ],
+        "measures": [
+          {
+            "name": "Total Income USD",
+            "expression": "CALCULATE(SUM(Transactions[amount_usd]), Transactions[is_expense] = FALSE())",
+            "formatString": "$#,##0.00"
+          },
+          {
+            "name": "Total Expenses USD",
+            "expression": "CALCULATE(SUM(Transactions[amount_usd]), Transactions[is_expense] = TRUE())",
+            "formatString": "$#,##0.00"
+          },
+          {
+            "name": "Net Savings USD",
+            "expression": "[Total Income USD] - [Total Expenses USD]",
+            "formatString": "$#,##0.00"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "Transactions_BankAccounts",
+        "fromTable": "Transactions",
+        "fromColumn": "account_id",
+        "toTable": "BankAccounts",
+        "toColumn": "id"
+      },
+      {
+        "name": "Transactions_Merchants",
+        "fromTable": "Transactions",
+        "fromColumn": "merchant_id",
+        "toTable": "Merchants",
+        "toColumn": "id"
+      }
+    ]
+  }
+}
