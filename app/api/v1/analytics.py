@@ -80,7 +80,6 @@ def get_revenue(
 @router.get("/category-summary", response_model=List[CategorySummaryItem])
 def get_category_summary(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Retrieve sales performance and unit distribution broken down by product category."""
     return AnalyticsService.get_category_summary(db)
@@ -89,16 +88,14 @@ def get_category_summary(
 @router.get("/banking-summary", response_model=BankingSummaryResponse)
 def get_banking_summary(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
-    """Retrieve banking analytics: income vs expenses, savings rate, EMI payments, and category spending."""
+    """Retrieve personal finance & banking report: monthly spending, savings, EMI, and available balance."""
     return AnalyticsService.get_banking_summary(db)
 
 
 @router.get("/data-quality", response_model=DataQualityMetrics)
 def get_data_quality(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Retrieve pipeline data quality metrics, validation pass rates, and rejection causes."""
     return AnalyticsService.get_data_quality_metrics(db)
